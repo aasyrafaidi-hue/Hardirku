@@ -1,0 +1,80 @@
+name: Tangkap skrin reka bentuk
+
+# Bina APK dan ambil tangkapan skrin pada emulator Android (data contoh) untuk semak reka bentuk.
+# Tidak membuat release; hanya simpan gambar sebagai artifact.
+on:
+  push:
+    branches: [ 'reka-*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  skrin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ekstrak zip projek
+        run: |
+          ZIP="$(ls *.zip | head -1)"
+          rm -rf projek && mkdir projek
+          unzip -q "$ZIP" -d projek
+          DIR="$(dirname "$(find projek -name settings.gradle.kts | head -1)")"
+          echo "PROJ=$DIR" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
+        working-directory: ${{ env.PROJ }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --stacktrace
+          mkdir -p "$GITHUB_WORKSPACE/apk"
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/apk/app.apk"
+
+      - name: Aktifkan KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Emulator & tangkap skrin
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash .github/skrip/tangkap.sh "$GITHUB_WORKSPACE/apk/app.apk" "$GITHUB_WORKSPACE/skrin"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skrin-${{ github.run_number }}
+          path: skrin/
+          if-no-files-found: ignore
+
+      # artifact tidak boleh dimuat turun dari semua rangkaian; salin juga ke cabang skrin-reka (gambar sahaja)
+      - name: Simpan skrin ke cabang skrin-reka
+        if: always()
+        run: |
+          [ -d skrin ] || exit 0
+          cd skrin
+          rm -f logcat-penuh.txt
+          git init -q
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q -b skrin-reka
+          git add -A
+          git commit -q -m "Tangkap skrin #${{ github.run_number }} (${{ github.sha }})"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" skrin-reka
