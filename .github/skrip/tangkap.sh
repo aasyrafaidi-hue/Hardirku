@@ -24,6 +24,7 @@ buka tab:senarai; tangkap 09-barang-dapur
 buka tab:kerja; tangkap 10-kerja
 buka tab:tetapan; tangkap 11-tetapan
 buka menu 3; tangkap 12-menu
+leret; tangkap 12b-menu-2
 adb shell input keyevent 4; sleep 2
 buka tab:poket 3
 # butang + tengah (pixel 6: 1080x2400)
@@ -36,8 +37,12 @@ buka tab:transaksi; tangkap 15-lejar-gelap
 buka tab:bayaran; tangkap 16-bayaran-gelap
 buka menu 3; tangkap 17-menu-gelap
 adb shell cmd uimode night no
+# ujian tekanan: 2,500 sentuhan/leretan rawak (benih tetap) — cari crash / tergantung
+adb shell monkey -p $PKG -s 4242 --throttle 120 --pct-syskeys 0 --pct-appswitch 2 --ignore-security-exceptions -v 2500 > "$OUT/monkey.txt" 2>&1 || true
+grep -E "CRASH|ANR|Exception" "$OUT/monkey.txt" | head -50 > "$OUT/monkey-ralat.txt" || true
+tail -3 "$OUT/monkey.txt" >> "$OUT/monkey-ralat.txt" || true
 adb logcat -d > "$OUT/logcat-penuh.txt" || true
-grep -E "AndroidRuntime|FATAL" "$OUT/logcat-penuh.txt" | head -200 > "$OUT/logcat-ralat.txt" || true
+grep -E "AndroidRuntime|FATAL|ANR in" "$OUT/logcat-penuh.txt" | head -200 > "$OUT/logcat-ralat.txt" || true
 grep "DuitkuJaga" "$OUT/logcat-penuh.txt" | head -200 > "$OUT/jaga.txt" || true
 grep "Choreographer" "$OUT/logcat-penuh.txt" | grep -i "skipped" | head -100 > "$OUT/bingkai.txt" || true
 ls -la "$OUT"
