@@ -2,7 +2,9 @@ name: Build Duitku Isteri APK
 
 on:
   push:
-    branches: [ main, master, 'enjin-*' ]
+    # main/master = PRODUCTION (Duitku sebenar, release penuh)
+    # dev / dev-* / enjin-* = DEV (app "Duitku DEV" berasingan; tidak menyentuh data sebenar)
+    branches: [ main, master, dev, 'dev-*', 'enjin-*' ]
   workflow_dispatch:
 
 permissions:
@@ -46,25 +48,50 @@ jobs:
           path: ${{ env.PROJ }}/app/build/reports/tests/
           if-no-files-found: ignore
 
-      - name: Build APK
+      - name: Pilih mod binaan
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/main" ] || [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            echo "MOD=production" >> "$GITHUB_ENV"
+            echo "TASK=assembleRelease" >> "$GITHUB_ENV"
+            echo "OUTAPK=app/build/outputs/apk/release/app-release.apk" >> "$GITHUB_ENV"
+            echo "NAMA=DuitkuIsteri-v1.0.${{ github.run_number }}.apk" >> "$GITHUB_ENV"
+          else
+            echo "MOD=dev" >> "$GITHUB_ENV"
+            echo "TASK=assembleDev" >> "$GITHUB_ENV"
+            echo "OUTAPK=app/build/outputs/apk/dev/app-dev.apk" >> "$GITHUB_ENV"
+            echo "NAMA=DuitkuDEV-v2.0.${{ github.run_number }}.apk" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build APK (${{ env.MOD }})
         working-directory: ${{ env.PROJ }}
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleRelease --stacktrace
+          ./gradlew "$TASK" --stacktrace
 
       - name: Namakan APK
-        run: cp "${{ env.PROJ }}/app/build/outputs/apk/release/app-release.apk" "DuitkuIsteri-v1.0.${{ github.run_number }}.apk"
+        run: cp "${{ env.PROJ }}/$OUTAPK" "$NAMA"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: DuitkuIsteri-v1.0.${{ github.run_number }}
-          path: DuitkuIsteri-v1.0.${{ github.run_number }}.apk
+          name: ${{ env.MOD }}-${{ github.run_number }}
+          path: ${{ env.NAMA }}
 
+      # PRODUCTION: release biasa (app di telefon dikemas kini atas Duitku sebenar)
       - uses: softprops/action-gh-release@v2
-        # Release hanya dari main/master; cabang lain cuma simpan APK sebagai artifact
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: env.MOD == 'production'
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: Duitku Isteri v1.0.${{ github.run_number }}
           body: APK dibina automatik daripada commit ${{ github.sha }}.
-          files: DuitkuIsteri-v1.0.${{ github.run_number }}.apk
+          files: ${{ env.NAMA }}
+
+      # DEV: pra-keluaran (pre-release) dari cabang dev sahaja; tidak menjadi "latest", tidak menimpa Duitku sebenar
+      - uses: softprops/action-gh-release@v2
+        if: env.MOD == 'dev' && (github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/dev-'))
+        with:
+          tag_name: dev-v2.0.${{ github.run_number }}
+          name: Duitku DEV v2.0.${{ github.run_number }}-dev
+          body: "Versi DEV (app berasingan: Duitku DEV, com.asyraf.hadirku.dev) daripada ${{ github.ref_name }} @ ${{ github.sha }}. Untuk diuji sahaja; data Duitku sebenar tidak terusik."
+          prerelease: true
+          make_latest: false
+          files: ${{ env.NAMA }}
