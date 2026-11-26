@@ -37,5 +37,7 @@ buka tab:bayaran; tangkap 16-bayaran-gelap
 buka menu 3; tangkap 17-menu-gelap
 adb shell cmd uimode night no
 adb logcat -d > "$OUT/logcat-penuh.txt" || true
-grep -E "AndroidRuntime|FATAL|hadirku" "$OUT/logcat-penuh.txt" | head -300 > "$OUT/logcat-ralat.txt" || true
+grep -E "AndroidRuntime|FATAL" "$OUT/logcat-penuh.txt" | head -200 > "$OUT/logcat-ralat.txt" || true
+grep "DuitkuJaga" "$OUT/logcat-penuh.txt" | head -200 > "$OUT/jaga.txt" || true
+grep "Choreographer" "$OUT/logcat-penuh.txt" | grep -i "skipped" | head -100 > "$OUT/bingkai.txt" || true
 ls -la "$OUT"
