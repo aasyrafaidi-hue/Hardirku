@@ -18,6 +18,8 @@ leret; tangkap 03-utama-3
 buka tab:transaksi; tangkap 04-lejar
 buka tab:bayaran; tangkap 05-bayaran
 leret; tangkap 06-bayaran-2
+buka bil 4; leret; leret; leret; leret; tangkap 06b-nafkah
+buka kewangan:matlamat 4; tangkap 08b-matlamat
 buka tab:laporan; tangkap 07-laporan
 buka tab:kewangan; tangkap 08-kewangan
 buka tab:senarai; tangkap 09-barang-dapur
