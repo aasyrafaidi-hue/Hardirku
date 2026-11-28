@@ -2,15 +2,15 @@
 # Tangkap skrin reka bentuk Duitku pada emulator (data contoh, tiada data peribadi).
 # Guna: tangkap.sh <apk> <folder-output>
 set -u
-APK="$1"; OUT="$2"; PKG=com.asyraf.hadirku
+APK="$1"; OUT="$2"; PKG="${PKG:-com.asyraf.hadirku}"
 mkdir -p "$OUT"
 adb install -r "$APK"
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS || true
 adb logcat -c || true
 tangkap() { adb exec-out screencap -p > "$OUT/$1.png"; echo "skrin $1"; }
-buka() { adb shell am start -n $PKG/.MainActivity --es buka "$1" > /dev/null; sleep "${2:-4}"; }
+buka() { adb shell am start -n $PKG/com.asyraf.hadirku.MainActivity --es buka "$1" > /dev/null; sleep "${2:-4}"; }
 leret() { adb shell input swipe 540 1700 540 600 450; sleep 2; }
-adb shell am start -W -n $PKG/.MainActivity
+adb shell am start -W -n $PKG/com.asyraf.hadirku.MainActivity
 sleep 10
 tangkap 01-utama
 leret; tangkap 02-utama-2

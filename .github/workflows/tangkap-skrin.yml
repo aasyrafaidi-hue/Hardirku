@@ -36,7 +36,14 @@ jobs:
         working-directory: ${{ env.PROJ }}
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleRelease --stacktrace
+          # cabang reka-isteri* → tangkap skrin app isteri
+          if [ "${GITHUB_REF_NAME#reka-isteri}" != "$GITHUB_REF_NAME" ]; then
+            ./gradlew assembleRelease -Papp=isteri --stacktrace
+            echo "PKG=com.asyraf.duitkuisteri" >> "$GITHUB_ENV"
+          else
+            ./gradlew assembleRelease --stacktrace
+            echo "PKG=com.asyraf.hadirku" >> "$GITHUB_ENV"
+          fi
           mkdir -p "$GITHUB_WORKSPACE/apk"
           cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/apk/app.apk"
 
