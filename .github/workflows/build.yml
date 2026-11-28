@@ -46,25 +46,37 @@ jobs:
           path: ${{ env.PROJ }}/app/build/reports/tests/
           if-no-files-found: ignore
 
-      - name: Build APK
+      - name: Build APK suami (Duitku)
         working-directory: ${{ env.PROJ }}
         run: |
           chmod +x ./gradlew
           ./gradlew assembleRelease --stacktrace
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/Duitku-v2.0.${{ github.run_number }}.apk"
 
-      - name: Namakan APK
-        run: cp "${{ env.PROJ }}/app/build/outputs/apk/release/app-release.apk" "DuitkuIsteri-v1.0.${{ github.run_number }}.apk"
+      # Kod sumber sama, versi isteri: com.asyraf.duitkuisteri, tiada OT/kerja (lihat app/build.gradle.kts)
+      - name: Build APK isteri (Duitku Isteri)
+        working-directory: ${{ env.PROJ }}
+        run: |
+          ./gradlew assembleRelease -Papp=isteri --stacktrace
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/DuitkuIsteri-v2.0.${{ github.run_number }}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: DuitkuIsteri-v1.0.${{ github.run_number }}
-          path: DuitkuIsteri-v1.0.${{ github.run_number }}.apk
+          name: Duitku-v2.0.${{ github.run_number }}
+          path: |
+            Duitku-v2.0.${{ github.run_number }}.apk
+            DuitkuIsteri-v2.0.${{ github.run_number }}.apk
 
       - uses: softprops/action-gh-release@v2
         # Release hanya dari main/master; cabang lain cuma simpan APK sebagai artifact
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: Duitku Isteri v1.0.${{ github.run_number }}
-          body: APK dibina automatik daripada commit ${{ github.sha }}.
-          files: DuitkuIsteri-v1.0.${{ github.run_number }}.apk
+          name: Duitku v2.0.${{ github.run_number }} (suami & isteri)
+          body: |
+            APK dibina automatik daripada commit ${{ github.sha }}.
+            - Duitku-v2.0.${{ github.run_number }}.apk — app suami (com.asyraf.hadirku)
+            - DuitkuIsteri-v2.0.${{ github.run_number }}.apk — app isteri (com.asyraf.duitkuisteri), tiada OT & kerja
+          files: |
+            Duitku-v2.0.${{ github.run_number }}.apk
+            DuitkuIsteri-v2.0.${{ github.run_number }}.apk

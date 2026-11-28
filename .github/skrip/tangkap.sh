@@ -2,7 +2,7 @@
 # Tangkap skrin reka bentuk Duitku pada emulator (data contoh, tiada data peribadi).
 # Guna: tangkap.sh <apk> <folder-output>
 set -u
-APK="$1"; OUT="$2"; PKG=com.asyraf.hadirku
+APK="$1"; OUT="$2"; PKG="${PKG:-com.asyraf.hadirku}"
 mkdir -p "$OUT"
 adb install -r "$APK"
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS || true
