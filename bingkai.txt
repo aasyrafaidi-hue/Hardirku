@@ -1,0 +1,14 @@
+11-28 15:53:57.500  2877  2877 I Choreographer: Skipped 90 frames!  The application may be doing too much work on its main thread.
+11-28 15:53:57.677   842   842 I Choreographer: Skipped 161 frames!  The application may be doing too much work on its main thread.
+11-28 15:53:59.616  1802  1802 I Choreographer: Skipped 297 frames!  The application may be doing too much work on its main thread.
+11-28 15:54:01.765  2877  2877 I Choreographer: Skipped 253 frames!  The application may be doing too much work on its main thread.
+11-28 15:54:03.073   842   842 I Choreographer: Skipped 122 frames!  The application may be doing too much work on its main thread.
+11-28 15:54:03.304  1802  1802 I Choreographer: Skipped 191 frames!  The application may be doing too much work on its main thread.
+11-28 15:54:56.822  1097  1097 I Choreographer: Skipped 65 frames!  The application may be doing too much work on its main thread.
+11-28 15:55:15.910  2877  2877 I Choreographer: Skipped 55 frames!  The application may be doing too much work on its main thread.
+11-28 15:55:34.213   842   842 I Choreographer: Skipped 47 frames!  The application may be doing too much work on its main thread.
+11-28 15:55:34.734   842   842 I Choreographer: Skipped 30 frames!  The application may be doing too much work on its main thread.
+11-28 15:55:57.197  1097  1097 I Choreographer: Skipped 52 frames!  The application may be doing too much work on its main thread.
+11-28 15:56:09.713  1553  1553 I Choreographer: Skipped 37 frames!  The application may be doing too much work on its main thread.
+11-28 15:56:11.721  1553  1553 I Choreographer: Skipped 102 frames!  The application may be doing too much work on its main thread.
+11-28 15:56:17.881   842   842 I Choreographer: Skipped 45 frames!  The application may be doing too much work on its main thread.

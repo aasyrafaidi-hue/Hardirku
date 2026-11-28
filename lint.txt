@@ -1,0 +1,12 @@
+JUMLAH 23
+Error	ProduceStateDoesNotAssignValue	2
+Warning	GradleDependency	9
+Information	AutoboxingStateCreation	7
+Warning	ObsoleteSdkInt	2
+Warning	ExifInterface	1
+Warning	OldTargetApi	1
+Warning	UnusedResources	1
+
+--- Fatal/Error ---
+ProduceStateDoesNotAssignValue main/java/com/asyraf/hadirku/ui/KewanganScreen.kt:74 - produceState calls should assign `value` inside the producer lambda
+ProduceStateDoesNotAssignValue main/java/com/asyraf/hadirku/ui/KewanganScreen.kt:222 - produceState calls should assign `value` inside the producer lambda
